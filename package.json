@@ -6,14 +6,15 @@
     "build": "pnpm --filter \"./frontend\" build && pnpm --filter \"./backend\" build",
     "lint": "pnpm --filter \"./frontend\" lint & pnpm --filter \"./backend\" lint",
     "format": "pnpm --filter \"./frontend\" format & pnpm --filter \"./backend\" format",
-    "env:setup": "node -e \"const fs=require('fs'); fs.copyFileSync('.env', 'frontend/.env'); fs.copyFileSync('.env', 'backend/.env')\"",
-    "env:clean": "node -e \"const fs=require('fs'); try{fs.unlinkSync('backend/.env')}catch(e){} try{fs.unlinkSync('frontend/.env')}catch(e){}\"",
+    "env:setup": "shx cp -n .env.example .env && pnpm -r env:setup",
+    "env:clean": "shx rm -f .env && pnpm -r env:clean",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
+    "shx": "^0.4.0",
     "typescript": "^5.6.0"
   }
 }
