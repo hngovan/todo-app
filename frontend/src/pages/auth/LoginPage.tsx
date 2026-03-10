@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label'
 import { ROUTES } from '@/constants/routes.constants'
 import { loginSchema } from '@/schemas/auth/login.schema'
 import type { LoginFormData } from '@/schemas/auth/login.schema'
+import { useAuthStore } from '@/stores/auth.store'
 
 export default function LoginPage() {
   const { t } = useTranslation('auth')
