@@ -1,0 +1,16 @@
+{
+  "avatar": "Ảnh đại diện",
+  "avatarDesc": "Thay đổi ảnh đại diện của bạn.",
+  "uploading": "Đang tải lên…",
+  "uploadAvatar": "Tải ảnh lên",
+  "profile": "Hồ sơ",
+  "profileDesc": "Cập nhật thông tin tài khoản của bạn.",
+  "name": "Tên",
+  "changePassword": "Đổi mật khẩu",
+  "changePasswordDesc": "Để trống nếu không muốn thay đổi mật khẩu.",
+  "oldPassword": "Mật khẩu hiện tại",
+  "newPassword": "Mật khẩu mới",
+  "saveChanges": "Lưu thay đổi",
+  "profileUpdated": "Cập nhật hồ sơ thành công",
+  "avatarUpdated": "Cập nhật ảnh đại diện thành công"
+}

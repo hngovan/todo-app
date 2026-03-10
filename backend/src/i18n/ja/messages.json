@@ -1,0 +1,30 @@
+{
+  "error": {
+    "todo_not_found": "Todoが見つかりません",
+    "todo_delete_failed": "Todoの削除に失敗しました",
+    "todo_update_failed": "Todoの更新に失敗しました",
+    "avatar_required": "アバターファイルが必要です",
+    "invalid_file_type": "無効なファイル形式です",
+    "file_too_large": "ファイルサイズが大きすぎます",
+    "user_not_found": "ユーザーが見つかりません",
+    "invalid_credentials": "メールアドレスまたはパスワードが正しくありません",
+    "email_in_use": "このメールアドレスは既に使用されています",
+    "password_incorrect": "現在のパスワードが間違っています",
+    "access_denied": "アクセスが拒否されました",
+    "todo_title_exists": "このタイトルのTodoは既に存在します",
+    "old_password_required": "新しいパスワードを設定するには古いパスワードが必要です",
+    "invalid_token": "無効または期限切れのトークン"
+  },
+  "success": {
+    "todo_deleted": "Todoを正常に削除しました"
+  },
+  "validation": {
+    "NOT_EMPTY": "{property} は必須です",
+    "IS_EMAIL": "{property} は有効なメールアドレスである必要があります",
+    "IS_STRING": "{property} は文字列である必要があります",
+    "MIN_LENGTH": "{property} は{constraints.0}文字以上である必要があります",
+    "MAX_LENGTH": "{property} は{constraints.0}文字以下である必要があります",
+    "IS_ENUM": "{property} は有効な値である必要があります",
+    "IS_DATE_STRING": "{property} は有効な日付である必要があります"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "avatar": "Avatar",
+  "avatarDesc": "Change your profile picture.",
+  "uploading": "Uploading…",
+  "uploadAvatar": "Upload Avatar",
+  "profile": "Profile",
+  "profileDesc": "Update your account details.",
+  "name": "Name",
+  "changePassword": "Change Password",
+  "changePasswordDesc": "Leave blank to keep current password.",
+  "oldPassword": "Current Password",
+  "newPassword": "New Password",
+  "saveChanges": "Save Changes",
+  "profileUpdated": "Profile updated successfully",
+  "avatarUpdated": "Avatar updated successfully"
+}

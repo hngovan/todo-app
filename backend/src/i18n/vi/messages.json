@@ -1,0 +1,30 @@
+{
+  "error": {
+    "todo_not_found": "Không tìm thấy công việc",
+    "todo_delete_failed": "Xóa công việc thất bại",
+    "todo_update_failed": "Cập nhật công việc thất bại",
+    "avatar_required": "Vui lòng chọn file ảnh đại diện",
+    "invalid_file_type": "Định dạng file không hợp lệ",
+    "file_too_large": "Kích thước file quá lớn",
+    "user_not_found": "Không tìm thấy người dùng",
+    "invalid_credentials": "Email hoặc mật khẩu không đúng",
+    "email_in_use": "Email đã được sử dụng",
+    "password_incorrect": "Mật khẩu hiện tại không đúng",
+    "access_denied": "Từ chối truy cập",
+    "todo_title_exists": "Một công việc với tiêu đề này đã tồn tại",
+    "old_password_required": "Cần nhập mật khẩu cũ để đổi mật khẩu mới",
+    "invalid_token": "Token không hợp lệ hoặc đã hết hạn"
+  },
+  "success": {
+    "todo_deleted": "Xóa công việc thành công"
+  },
+  "validation": {
+    "NOT_EMPTY": "{property} không được để trống",
+    "IS_EMAIL": "{property} phải là email hợp lệ",
+    "IS_STRING": "{property} phải là chuỗi ký tự",
+    "MIN_LENGTH": "{property} phải có ít nhất {constraints.0} ký tự",
+    "MAX_LENGTH": "{property} không được vượt quá {constraints.0} ký tự",
+    "IS_ENUM": "{property} không hợp lệ",
+    "IS_DATE_STRING": "{property} phải là ngày tháng hợp lệ"
+  }
+}

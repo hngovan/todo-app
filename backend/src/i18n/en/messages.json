@@ -1,0 +1,30 @@
+{
+  "error": {
+    "todo_not_found": "Todo not found",
+    "todo_delete_failed": "Failed to delete todo",
+    "todo_update_failed": "Failed to update todo",
+    "avatar_required": "Avatar file is required",
+    "invalid_file_type": "Invalid file type",
+    "file_too_large": "File size is too large",
+    "user_not_found": "User not found",
+    "invalid_credentials": "Email or password incorrect",
+    "email_in_use": "Email is already in use",
+    "password_incorrect": "Current password is incorrect",
+    "access_denied": "Access denied",
+    "todo_title_exists": "A todo with this title already exists",
+    "old_password_required": "Old password is required to set a new password",
+    "invalid_token": "Invalid or expired token"
+  },
+  "success": {
+    "todo_deleted": "Todo deleted successfully"
+  },
+  "validation": {
+    "NOT_EMPTY": "{property} should not be empty",
+    "IS_EMAIL": "{property} must be an email",
+    "IS_STRING": "{property} must be a string",
+    "MIN_LENGTH": "{property} must be longer than or equal to {constraints.0} characters",
+    "MAX_LENGTH": "{property} must be shorter than or equal to {constraints.0} characters",
+    "IS_ENUM": "{property} must be a valid enum value",
+    "IS_DATE_STRING": "{property} must be a valid ISO 8601 date string"
+  }
+}

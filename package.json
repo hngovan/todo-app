@@ -1,0 +1,19 @@
+{
+  "name": "todo-app-root",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter \"./frontend\" dev & pnpm --filter \"./backend\" start:dev",
+    "build": "pnpm --filter \"./frontend\" build && pnpm --filter \"./backend\" build",
+    "lint": "pnpm --filter \"./frontend\" lint & pnpm --filter \"./backend\" lint",
+    "format": "pnpm --filter \"./frontend\" format & pnpm --filter \"./backend\" format",
+    "env:setup": "node -e \"const fs=require('fs'); fs.copyFileSync('.env', 'frontend/.env'); fs.copyFileSync('.env', 'backend/.env')\"",
+    "env:clean": "node -e \"const fs=require('fs'); try{fs.unlinkSync('backend/.env')}catch(e){} try{fs.unlinkSync('frontend/.env')}catch(e){}\"",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "typescript": "^5.6.0"
+  }
+}

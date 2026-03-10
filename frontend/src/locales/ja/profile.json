@@ -1,0 +1,16 @@
+{
+  "avatar": "アバター",
+  "avatarDesc": "プロフィール画像を変更します。",
+  "uploading": "アップロード中…",
+  "uploadAvatar": "アバターをアップロード",
+  "profile": "プロフィール",
+  "profileDesc": "アカウント情報を更新します。",
+  "name": "名前",
+  "changePassword": "パスワードを変更",
+  "changePasswordDesc": "空白のままにすると現在のパスワードが維持されます。",
+  "oldPassword": "現在のパスワード",
+  "newPassword": "新しいパスワード",
+  "saveChanges": "変更を保存",
+  "profileUpdated": "プロフィールを更新しました",
+  "avatarUpdated": "アバターを更新しました"
+}
