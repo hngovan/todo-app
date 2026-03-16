@@ -1,10 +1,12 @@
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, FolderOpen } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
+import { categoryApi } from '@/apis/categoryApi'
 import { todoApi } from '@/apis/todoApi'
+import CategoryManagerDialog from '@/components/category/CategoryManagerDialog'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import TodoFormDialog from '@/components/todo/TodoFormDialog'
 import TodoItem from '@/components/todo/TodoItem'
@@ -21,10 +23,13 @@ import {
 } from '@/components/ui/select'
 import { useDebounce } from '@/hooks/useDebounce'
 import type {
+  Category,
+  CreateCategoryPayload,
   CreateTodoPayload,
   Todo,
   TodoFilter,
   TodoSort,
+  UpdateCategoryPayload,
   UpdateTodoPayload
 } from '@/types'
 
@@ -36,6 +41,7 @@ export default function TodosPage() {
 
   const [todos, setTodos] = useState<Todo[]>([])
   const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState<Category[]>([])
 
   const filter = (searchParams.get('filter') as TodoFilter) || 'all'
   const sort = (searchParams.get('sort') as TodoSort) || 'createdAt_desc'
@@ -45,7 +51,6 @@ export default function TodosPage() {
   const debouncedSearch = useDebounce(search, 400)
 
   useEffect(() => {
-    // sync search to params after debounce
     const params = new URLSearchParams(searchParams)
     if (debouncedSearch) {
       params.set('search', debouncedSearch)
@@ -72,7 +77,19 @@ export default function TodosPage() {
   const [editingTodo, setEditingTodo] = useState<Todo | undefined>(undefined)
   const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null)
 
+  // Category management
+  const [managerOpen, setManagerOpen] = useState(false)
+
   // ── Data fetching ────────────────────────────────────────────────────────
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await categoryApi.getAll()
+      setCategories(res.data)
+    } catch {
+      /* quiet */
+    }
+  }, [])
 
   const fetchTodos = useCallback(async () => {
     setLoading(true)
@@ -91,6 +108,10 @@ export default function TodosPage() {
   }, [filter, sort, debouncedSearch])
 
   useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
+
+  useEffect(() => {
     fetchTodos()
   }, [fetchTodos])
 
@@ -100,6 +121,50 @@ export default function TodosPage() {
   const progress = todos.length
     ? Math.round((completedCount / todos.length) * 100)
     : 0
+
+  // ── Category CRUD ────────────────────────────────────────────────────────
+
+  const handleCategorySave = async (
+    payload: CreateCategoryPayload | UpdateCategoryPayload,
+    editingCategoryId?: string
+  ) => {
+    if (editingCategoryId) {
+      const res = await categoryApi.update(
+        editingCategoryId,
+        payload as UpdateCategoryPayload
+      )
+      setCategories(prev =>
+        prev.map(c => (c.id === res.data.id ? res.data : c))
+      )
+      setTodos(prev =>
+        prev.map(td =>
+          td.categoryId === res.data.id ? { ...td, category: res.data } : td
+        )
+      )
+      toast.success(t('categoryUpdated'))
+    } else {
+      const res = await categoryApi.create(payload as CreateCategoryPayload)
+      setCategories(prev => [...prev, res.data])
+      toast.success(t('categoryCreated'))
+    }
+  }
+
+  const handleCategoryDelete = async (category: Category) => {
+    try {
+      await categoryApi.delete(category.id)
+      setCategories(prev => prev.filter(c => c.id !== category.id))
+      setTodos(prev =>
+        prev.map(td =>
+          td.categoryId === category.id
+            ? { ...td, categoryId: null, category: null }
+            : td
+        )
+      )
+      toast.success(t('categoryDeleted', 'Category deleted'))
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   // ── CRUD handlers ────────────────────────────────────────────────────────
 
@@ -124,8 +189,6 @@ export default function TodosPage() {
     if (files && files.length > 0) {
       res = await todoApi.uploadAttachments(res.data.id, files)
     }
-    // Merge with existing todo to preserve fields (e.g. `completed`) that may not
-    // be present in the PATCH/upload response body.
     setTodos(prev =>
       prev.map(td => (td.id === res.data.id ? { ...td, ...res.data } : td))
     )
@@ -190,7 +253,7 @@ export default function TodosPage() {
         </CardContent>
       </Card>
 
-      {/* Search + Add */}
+      {/* Search + Add + Categories */}
       <div className="flex flex-col gap-4">
         <div className="flex gap-2">
           <div className="relative flex-1">
@@ -203,6 +266,14 @@ export default function TodosPage() {
               autoComplete="off"
             />
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={t('manageCategories')}
+            onClick={() => setManagerOpen(true)}
+          >
+            <FolderOpen className="h-4 w-4" />
+          </Button>
           <Button onClick={openCreate} size="icon" aria-label={t('addTodo')}>
             <Plus className="h-4 w-4" />
           </Button>
@@ -276,6 +347,14 @@ export default function TodosPage() {
         onClose={() => setFormOpen(false)}
         onSave={editingTodo ? handleUpdate : handleCreate}
         initial={editingTodo}
+        categories={categories}
+      />
+      <CategoryManagerDialog
+        open={managerOpen}
+        onClose={() => setManagerOpen(false)}
+        categories={categories}
+        onSave={handleCategorySave}
+        onDelete={handleCategoryDelete}
       />
       <ConfirmDialog
         open={!!deletingTodo}

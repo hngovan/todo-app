@@ -30,6 +30,13 @@ export const authApi = {
     return data
   },
 
+  logout: async (): Promise<{ success: boolean }> => {
+    const { data } = await axiosInstance.post<{ success: boolean }>(
+      API_ENDPOINTS.AUTH.LOGOUT
+    )
+    return data
+  },
+
   getMe: async () => {
     const { data } = await axiosInstance.get(API_ENDPOINTS.AUTH.ME)
     return data

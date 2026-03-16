@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from '@/users/entities/user.entity'
 import { Todo } from '@/todos/entities/todo.entity'
+import { Category } from '@/categories/entities/category.entity'
+import { Holiday } from '@/holidays/entities/holiday.entity'
 
 // best-practice: arch-feature-modules, db-use-migrations
 @Module({
@@ -17,7 +19,7 @@ import { Todo } from '@/todos/entities/todo.entity'
         username: config.getOrThrow<string>('DB_USER'),
         password: config.getOrThrow<string>('DB_PASSWORD'),
         database: config.getOrThrow<string>('DB_NAME'),
-        entities: [User, Todo],
+        entities: [User, Todo, Category, Holiday],
         migrations: ['dist/database/migrations/*.js'],
         migrationsRun: true, // auto-run pending migrations on app start
         synchronize: false, // never synchronize — use migrations (db-use-migrations)

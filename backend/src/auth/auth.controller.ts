@@ -50,4 +50,15 @@ export class AuthController {
   refresh(@Body('refresh_token') refreshToken: string) {
     return this.authService.refreshTokens(refreshToken)
   }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Logout the current user' })
+  @ApiResponse({ status: 200, description: 'Logout successful' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  logout(@GetUser() user: User) {
+    return this.authService.logout(user.id)
+  }
 }

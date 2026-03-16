@@ -1,6 +1,6 @@
-import { IsString, IsOptional, MinLength, MaxLength, IsDateString, IsEnum } from 'class-validator'
+import { IsString, IsOptional, MinLength, MaxLength, IsDateString, IsInt, Min, Max } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Priority, TODO_CONSTRAINTS } from '@/common/constants/todo.constants'
+import { TODO_CONSTRAINTS, PRIORITY_MIN, PRIORITY_MAX, PRIORITY_DEFAULT } from '@/common/constants/todo.constants'
 
 // best-practice: security-validate-all-input
 export class CreateTodoDto {
@@ -15,12 +15,25 @@ export class CreateTodoDto {
   @IsString()
   description?: string
 
-  @ApiProperty({ example: '2026-12-31' })
+  @ApiProperty({ example: '2026-12-31T14:30:00Z' })
   @IsDateString()
   dueDate: string
 
-  @ApiPropertyOptional({ enum: Priority, default: Priority.Medium })
+  @ApiPropertyOptional({
+    example: PRIORITY_DEFAULT,
+    minimum: PRIORITY_MIN,
+    maximum: PRIORITY_MAX,
+    default: PRIORITY_DEFAULT,
+    description: `Priority from ${PRIORITY_MIN} (highest) to ${PRIORITY_MAX} (lowest)`
+  })
   @IsOptional()
-  @IsEnum(Priority)
-  priority?: Priority
+  @IsInt()
+  @Min(PRIORITY_MIN)
+  @Max(PRIORITY_MAX)
+  priority?: number
+
+  @ApiPropertyOptional({ example: null, description: 'UUID of the category' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string | null
 }

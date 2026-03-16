@@ -8,6 +8,8 @@ import 'dotenv/config'
 import { DataSource } from 'typeorm'
 import { User } from '../users/entities/user.entity'
 import { Todo } from '../todos/entities/todo.entity'
+import { Category } from '../categories/entities/category.entity'
+import { Holiday } from '../holidays/entities/holiday.entity'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -18,7 +20,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  entities: isProd ? ['dist/**/*.entity.js'] : [User, Todo],
+  entities: isProd ? ['dist/**/*.entity.js'] : [User, Todo, Category, Holiday],
   migrations: isProd ? ['dist/database/migrations/*.js'] : ['src/database/migrations/*.ts'],
   synchronize: false,
   logging: true

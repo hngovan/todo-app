@@ -14,8 +14,15 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { ROUTES } from '@/constants/routes.constants'
 import { registerSchema } from '@/schemas/auth/register.schema'
 import type { RegisterFormData } from '@/schemas/auth/register.schema'
@@ -26,13 +33,15 @@ export default function RegisterPage() {
   const login = useAuthStore(s => s.login)
   const navigate = useNavigate()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting }
-  } = useForm<RegisterFormData>({
+  const form = useForm<RegisterFormData>({
+    mode: 'onChange',
     resolver: zodResolver(registerSchema),
-    mode: 'onChange'
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    }
   })
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -59,88 +68,105 @@ export default function RegisterPage() {
         <CardDescription>{t('registerSubtitle')}</CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">{t('name')}</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder={t('namePlaceholder')}
-              autoComplete="name"
-              {...register('name')}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('name')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t('namePlaceholder')}
+                      autoComplete="name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.name && (
-              <p className="text-destructive text-sm">
-                {t(errors.name.message!)}
-              </p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">{t('email')}</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t('emailPlaceholder')}
-              autoComplete="email"
-              {...register('email')}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('email')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder={t('emailPlaceholder')}
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.email && (
-              <p className="text-destructive text-sm">
-                {t(errors.email.message!)}
-              </p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">{t('password')}</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder={t('passwordPlaceholder')}
-              autoComplete="new-password"
-              {...register('password')}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('password')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder={t('passwordPlaceholder')}
+                      autoComplete="new-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.password && (
-              <p className="text-destructive text-sm">
-                {t(errors.password.message!)}
-              </p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder={t('passwordPlaceholder')}
-              autoComplete="new-password"
-              {...register('confirmPassword')}
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('confirmPassword')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder={t('passwordPlaceholder')}
+                      autoComplete="new-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.confirmPassword && (
-              <p className="text-destructive text-sm">
-                {t(errors.confirmPassword.message!)}
-              </p>
-            )}
-          </div>
-        </CardContent>
+          </CardContent>
 
-        <CardFooter className="flex flex-col gap-3">
-          <Button type="submit" className="w-full" loading={isSubmitting}>
-            {t('register')}
-          </Button>
-          <p className="text-muted-foreground text-center text-sm">
-            {t('hasAccount')}{' '}
-            <Link
-              to={ROUTES.AUTH.LOGIN}
-              className="text-primary font-medium underline-offset-4 hover:underline"
+          <CardFooter className="flex flex-col gap-3">
+            <Button
+              type="submit"
+              className="w-full"
+              loading={form.formState.isSubmitting}
             >
-              {t('signIn')}
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
+              {t('register')}
+            </Button>
+            <p className="text-muted-foreground text-center text-sm">
+              {t('hasAccount')}{' '}
+              <Link
+                to={ROUTES.AUTH.LOGIN}
+                className="text-primary font-medium underline-offset-4 hover:underline"
+              >
+                {t('signIn')}
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
+      </Form>
     </Card>
   )
 }

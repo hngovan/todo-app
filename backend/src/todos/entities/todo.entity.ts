@@ -7,8 +7,10 @@ import {
   ManyToOne,
   JoinColumn
 } from 'typeorm'
-import { User } from '@/users/entities/user.entity'
-import { Priority } from '@/common/constants/todo.constants'
+import { User } from '../../users/entities/user.entity'
+import { Category } from '../../categories/entities/category.entity'
+import { PRIORITY_DEFAULT } from '../../common/constants/todo.constants'
+import type { Priority } from '../../common/constants/todo.constants'
 
 @Entity('todos')
 export class Todo {
@@ -24,10 +26,10 @@ export class Todo {
   @Column({ default: false })
   completed: boolean
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   dueDate: string | null
 
-  @Column({ type: 'varchar', length: 10, default: 'medium' })
+  @Column({ type: 'smallint', default: PRIORITY_DEFAULT })
   priority: Priority
 
   @Column({ type: 'simple-array', nullable: true, default: null })
@@ -39,6 +41,13 @@ export class Todo {
   @ManyToOne(() => User, user => user.todos, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User
+
+  @Column({ nullable: true })
+  categoryId: string | null
+
+  @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL', eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category | null
 
   @CreateDateColumn()
   createdAt: Date

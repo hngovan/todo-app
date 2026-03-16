@@ -5,22 +5,13 @@
 
 // ── Priority ──────────────────────────────────────────────────────────────────
 
-/** Use this object with @IsEnum(Priority) in class-validator */
-export const Priority = {
-  Low: 'low',
-  Medium: 'medium',
-  High: 'high'
-} as const
+/** Priority is a number from 1 (highest) to 10 (lowest). */
+export type Priority = number
 
-/** String union type for Priority values */
-export type Priority = (typeof Priority)[keyof typeof Priority]
-
-/** Numeric weight for in-memory priority sorting (lower = higher priority). */
-export const PRIORITY_ORDER: Record<Priority, number> = {
-  [Priority.High]: 1,
-  [Priority.Medium]: 2,
-  [Priority.Low]: 3
-}
+/** Min and max priority values */
+export const PRIORITY_MIN = 1
+export const PRIORITY_MAX = 10
+export const PRIORITY_DEFAULT = 5
 
 // ── Filter ────────────────────────────────────────────────────────────────────
 
@@ -38,7 +29,9 @@ export const TodoSort = {
   CreatedAtDesc: 'createdAt_desc',
   CreatedAtAsc: 'createdAt_asc',
   PriorityDesc: 'priority_desc',
-  PriorityAsc: 'priority_asc'
+  PriorityAsc: 'priority_asc',
+  DueDateDesc: 'dueDate_desc',
+  DueDateAsc: 'dueDate_asc'
 } as const
 
 export type TodoSort = (typeof TodoSort)[keyof typeof TodoSort]

@@ -58,6 +58,10 @@ The easiest way to initialize the required services (PostgreSQL, pgAdmin, and Mi
 # Start with Docker (recommended)
 docker compose up -d
 
+# Start with Docker Compose Watch (Frontend auto-sync)
+# This will sync local changes to the container and rebuild on dependency changes
+docker compose watch
+
 # Stop all services
 docker compose down
 

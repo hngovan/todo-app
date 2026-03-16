@@ -6,9 +6,12 @@ import * as path from 'path'
 import { AuthModule } from './auth/auth.module'
 import { UsersModule } from './users/users.module'
 import { TodosModule } from './todos/todos.module'
+import { CategoriesModule } from './categories/categories.module'
 import { DatabaseModule } from './database/database.module'
 import { StorageModule } from './storage/storage.module'
 import { envValidationSchema } from './config/env.validation'
+import { NotificationsModule } from './notifications/notifications.module'
+import { HolidaysModule } from './holidays/holidays.module'
 
 @Module({
   imports: [
@@ -43,7 +46,10 @@ import { envValidationSchema } from './config/env.validation'
     // Feature modules
     AuthModule,
     UsersModule,
-    TodosModule
+    TodosModule,
+    CategoriesModule,
+    NotificationsModule,
+    HolidaysModule
   ]
 })
 export class AppModule {}

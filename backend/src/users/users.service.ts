@@ -82,4 +82,15 @@ export class UsersService {
     const { password, todos, ...profile } = saved
     return profile
   }
+
+  async setCurrentRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
+    const user = await this.findById(userId)
+    if (refreshToken) {
+      const salt = await bcrypt.genSalt(10)
+      user.currentRefreshToken = await bcrypt.hash(refreshToken, salt)
+    } else {
+      user.currentRefreshToken = null
+    }
+    await this.userRepository.save(user)
+  }
 }

@@ -31,19 +31,23 @@ const TODAY_LABELS: Record<string, string> = {
 }
 
 interface DatePickerProps {
+  id?: string
   value: string // ISO date string "YYYY-MM-DD" or empty string
   onChange: (date: string) => void
   placeholder?: string
   className?: string
   disablePast?: boolean
+  children?: React.ReactNode
 }
 
 export function DatePicker({
+  id,
   value,
   onChange,
   placeholder = 'Pick a date',
   className,
-  disablePast = true
+  disablePast = true,
+  children
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const { i18n } = useTranslation()
@@ -62,21 +66,24 @@ export function DatePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            'w-full justify-start overflow-hidden text-left font-normal',
-            !value && 'text-muted-foreground',
-            className
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          <span className="truncate">
-            {value
-              ? format(parseISO(value), 'PPP', { locale: dateFnsLocale })
-              : placeholder}
-          </span>
-        </Button>
+        {children || (
+          <Button
+            id={id}
+            variant="outline"
+            className={cn(
+              'w-full justify-start overflow-hidden text-left font-normal',
+              !value && 'text-muted-foreground',
+              className
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            <span className="truncate">
+              {value
+                ? format(parseISO(value), 'PPP', { locale: dateFnsLocale })
+                : placeholder}
+            </span>
+          </Button>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar

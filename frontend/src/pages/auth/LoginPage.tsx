@@ -14,8 +14,15 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { ROUTES } from '@/constants/routes.constants'
 import { loginSchema } from '@/schemas/auth/login.schema'
 import type { LoginFormData } from '@/schemas/auth/login.schema'
@@ -26,13 +33,13 @@ export default function LoginPage() {
   const login = useAuthStore(s => s.login)
   const navigate = useNavigate()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting }
-  } = useForm<LoginFormData>({
+  const form = useForm<LoginFormData>({
+    mode: 'onChange',
     resolver: zodResolver(loginSchema),
-    mode: 'onChange'
+    defaultValues: {
+      email: '',
+      password: ''
+    }
   })
 
   const onSubmit = async (data: LoginFormData) => {
@@ -53,56 +60,68 @@ export default function LoginPage() {
         <CardDescription>{t('loginSubtitle')}</CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t('email')}</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t('emailPlaceholder')}
-              autoComplete="email"
-              {...register('email')}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('email')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder={t('emailPlaceholder')}
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.email && (
-              <p className="text-destructive text-sm">
-                {t(errors.email.message!)}
-              </p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">{t('password')}</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder={t('passwordPlaceholder')}
-              autoComplete="current-password"
-              {...register('password')}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('password')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder={t('passwordPlaceholder')}
+                      autoComplete="current-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.password && (
-              <p className="text-destructive text-sm">
-                {t(errors.password.message!)}
-              </p>
-            )}
-          </div>
-        </CardContent>
+          </CardContent>
 
-        <CardFooter className="flex flex-col gap-3">
-          <Button type="submit" className="w-full" loading={isSubmitting}>
-            {t('login')}
-          </Button>
-          <p className="text-muted-foreground text-center text-sm">
-            {t('noAccount')}{' '}
-            <Link
-              to={ROUTES.AUTH.REGISTER}
-              className="text-primary font-medium underline-offset-4 hover:underline"
+          <CardFooter className="flex flex-col gap-3">
+            <Button
+              type="submit"
+              className="w-full"
+              loading={form.formState.isSubmitting}
             >
-              {t('signUp')}
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
+              {t('login')}
+            </Button>
+            <p className="text-muted-foreground text-center text-sm">
+              {t('noAccount')}{' '}
+              <Link
+                to={ROUTES.AUTH.REGISTER}
+                className="text-primary font-medium underline-offset-4 hover:underline"
+              >
+                {t('signUp')}
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
+      </Form>
     </Card>
   )
 }

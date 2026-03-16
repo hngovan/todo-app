@@ -83,6 +83,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
+      NODE_ENV: production
       DB_HOST: postgres
       MINIO_ENDPOINT: minio
     depends_on:
@@ -90,6 +91,18 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: /app/src
+        - action: rebuild
+          path: ./backend/package.json
+        - action: rebuild
+          path: ./backend/pnpm-lock.yaml
+    volumes:
+      - ./backend/src:/app/src
+      - /app/node_modules
 
   # ── Frontend (Vite) ─────────────────────────────────────────────────────────
   frontend:
@@ -104,6 +117,18 @@ services:
       - ./frontend/.env
     depends_on:
       - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+        - action: sync
+          path: ./frontend/public
+          target: /app/public
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/pnpm-lock.yaml
     volumes:
       - ./frontend/src:/app/src
       - /app/node_modules

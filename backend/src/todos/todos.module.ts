@@ -25,6 +25,7 @@ import { TODO_CONSTRAINTS, ALLOWED_MIME_TYPES } from '@/common/constants/todo.co
     })
   ],
   controllers: [TodosController],
-  providers: [TodosService]
+  providers: [TodosService],
+  exports: [TodosService]
 })
 export class TodosModule {}

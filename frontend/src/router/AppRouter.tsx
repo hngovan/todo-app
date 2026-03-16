@@ -19,11 +19,17 @@ const TodosPage = withLoading(TodosPageLazy)
 const ProfilePageLazy = lazy(() => import('@/pages/profile/ProfilePage'))
 const ProfilePage = withLoading(ProfilePageLazy)
 
+const CalendarPageLazy = lazy(() => import('@/pages/calendar/CalendarPage'))
+const CalendarPage = withLoading(CalendarPageLazy)
+
+const DashboardPageLazy = lazy(() => import('@/pages/dashboard/DashboardPage'))
+const DashboardPage = withLoading(DashboardPageLazy)
+
 const router = createBrowserRouter([
-  // Redirect root → /todos
+  // Legacy /dashboard URL → redirect to home
   {
-    path: ROUTES.ROOT,
-    element: <Navigate to={ROUTES.TODOS.LIST} replace />
+    path: '/dashboard',
+    element: <Navigate to={ROUTES.ROOT} replace />
   },
 
   // Auth routes (guest only)
@@ -47,7 +53,9 @@ const router = createBrowserRouter([
       {
         element: <DefaultLayout />,
         children: [
+          { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
           { path: ROUTES.TODOS.LIST, element: <TodosPage /> },
+          { path: ROUTES.CALENDAR, element: <CalendarPage /> },
           { path: ROUTES.PROFILE, element: <ProfilePage /> }
         ]
       }

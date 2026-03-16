@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm'
 import { Exclude } from 'class-transformer'
 import { ApiHideProperty } from '@nestjs/swagger'
-import { Todo } from '@/todos/entities/todo.entity'
+import { Todo } from '../../todos/entities/todo.entity'
 
 @Entity('users')
 export class User {
@@ -24,6 +24,14 @@ export class User {
 
   @OneToMany(() => Todo, todo => todo.user, { cascade: true })
   todos: Todo[]
+
+  @Column({ default: true })
+  notifyEmail: boolean
+
+  @ApiHideProperty()
+  @Exclude()
+  @Column({ type: 'varchar', length: 500, nullable: true, default: null })
+  currentRefreshToken: string | null
 
   @CreateDateColumn()
   createdAt: Date

@@ -7,5 +7,7 @@ export const ROUTES = {
   TODOS: {
     LIST: '/todos'
   },
+  DASHBOARD: '/',
+  CALENDAR: '/calendar',
   PROFILE: '/profile'
 } as const

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+import { authApi } from '@/apis/authApi'
 import { STORAGE_KEYS } from '@/constants/storage.constants'
 import type { User } from '@/types'
 
@@ -24,13 +25,19 @@ export const useAuthStore = create<AuthState>()(
       login: (user, token, refreshToken) =>
         set({ user, token, refreshToken, isAuthenticated: true }),
 
-      logout: () =>
+      logout: async () => {
+        try {
+          await authApi.logout()
+        } catch {
+          /* ignore - still clear state */
+        }
         set({
           user: null,
           token: null,
           refreshToken: null,
           isAuthenticated: false
         })
+      }
     }),
     {
       name: STORAGE_KEYS.AUTH_STORAGE,

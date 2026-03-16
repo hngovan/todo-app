@@ -5,7 +5,7 @@ import { extname } from 'path'
 import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
 
-export type StorageFolder = 'avatars' | 'todos'
+export type StorageFolder = 'avatars' | 'todos' | 'categories'
 
 // best-practice: arch-single-responsibility
 @Injectable()

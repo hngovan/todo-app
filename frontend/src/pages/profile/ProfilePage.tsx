@@ -14,9 +14,17 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { getImageUrl } from '@/lib/storage'
+import { cn } from '@/lib/utils'
 import { profileSchema } from '@/schemas/profile/profile.schema'
 import type { ProfileFormData } from '@/schemas/profile/profile.schema'
 import { useAuthStore } from '@/stores/auth.store'
@@ -28,14 +36,9 @@ export default function ProfilePage() {
   const [avatarUploading, setAvatarUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isDirty }
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+  const form = useForm<ProfileFormData>({
     mode: 'onChange',
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name || '',
       oldPassword: '',
@@ -57,7 +60,7 @@ export default function ProfilePage() {
       const res = await userApi.updateProfile(payload)
       useAuthStore.setState({ user: res.data })
       // Update defaultValues → isDirty becomes false → Save button disables
-      reset({ name: data.name, oldPassword: '', newPassword: '' })
+      form.reset({ name: data.name, oldPassword: '', newPassword: '' })
       toast.success(t('profileUpdated'))
     } catch (error) {
       console.error(error)
@@ -130,65 +133,93 @@ export default function ProfilePage() {
           <CardTitle>{t('profile')}</CardTitle>
           <CardDescription>{t('profileDesc')}</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">{t('name')}</Label>
-              <Input id="name" autoComplete="name" {...register('name')} />
-              {errors.name && (
-                <p className="text-destructive text-sm">
-                  {t(errors.name.message!, { ns: 'auth' })}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2 pt-4">
-              <h4 className="text-sm font-medium">{t('changePassword')}</h4>
-              <p className="text-muted-foreground text-xs">
-                {t('changePasswordDesc')}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="oldPassword">{t('oldPassword')}</Label>
-              <Input
-                id="oldPassword"
-                type="password"
-                autoComplete="current-password"
-                {...register('oldPassword')}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('name')}</FormLabel>
+                    <FormControl>
+                      <Input autoComplete="name" maxLength={100} {...field} />
+                    </FormControl>
+                    <div className="flex items-center justify-between">
+                      <FormMessage />
+                      <span
+                        className={cn(
+                          'text-xs transition-colors',
+                          field.value.length >= 100
+                            ? 'font-bold text-orange-500'
+                            : field.value.length > 80
+                              ? 'text-orange-400'
+                              : 'text-muted-foreground'
+                        )}
+                      >
+                        {field.value.length}/100
+                      </span>
+                    </div>
+                  </FormItem>
+                )}
               />
-              {errors.oldPassword && (
-                <p className="text-destructive text-sm">
-                  {t(errors.oldPassword.message!, { ns: 'auth' })}
-                </p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">{t('newPassword')}</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                autoComplete="new-password"
-                {...register('newPassword')}
-              />
-              {errors.newPassword && (
-                <p className="text-destructive text-sm">
-                  {t(errors.newPassword.message!, { ns: 'auth' })}
+              <div className="space-y-2 pt-4">
+                <h4 className="text-sm font-medium">{t('changePassword')}</h4>
+                <p className="text-muted-foreground text-xs">
+                  {t('changePasswordDesc')}
                 </p>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              disabled={isSubmitting || !isDirty}
-            >
-              {t('saveChanges')}
-            </Button>
-          </CardFooter>
-        </form>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="oldPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('oldPassword')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="current-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('newPassword')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            <CardFooter>
+              <Button
+                type="submit"
+                loading={form.formState.isSubmitting}
+                disabled={
+                  form.formState.isSubmitting || !form.formState.isDirty
+                }
+              >
+                {t('saveChanges')}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
     </div>
   )

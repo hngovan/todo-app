@@ -4,7 +4,7 @@ import { Repository, Like } from 'typeorm'
 import { Todo } from './entities/todo.entity'
 import { CreateTodoDto } from './dto/create-todo.dto'
 import { UpdateTodoDto } from './dto/update-todo.dto'
-import { TodoFilter, TodoSort, PRIORITY_ORDER } from '@/common/constants/todo.constants'
+import { TodoFilter, TodoSort } from '@/common/constants/todo.constants'
 
 // best-practice: arch-use-repository-pattern, arch-single-responsibility, devops-use-logging
 @Injectable()
@@ -30,14 +30,16 @@ export class TodosService {
     let order: Record<string, 'ASC' | 'DESC'> = { createdAt: 'DESC' }
     if (sort === TodoSort.CreatedAtAsc) order = { createdAt: 'ASC' }
     else if (sort === TodoSort.CreatedAtDesc) order = { createdAt: 'DESC' }
+    else if (sort === TodoSort.DueDateAsc) order = { dueDate: 'ASC' }
+    else if (sort === TodoSort.DueDateDesc) order = { dueDate: 'DESC' }
 
     const todos = await this.todoRepository.find({ where, order })
 
-    // Priority sort done in-memory (avoids complex CASE WHEN SQL)
+    // Priority sort done in-memory (numeric: 1 = highest priority)
     if (sort === TodoSort.PriorityDesc) {
-      todos.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
+      todos.sort((a, b) => (a.priority ?? 5) - (b.priority ?? 5))
     } else if (sort === TodoSort.PriorityAsc) {
-      todos.sort((a, b) => PRIORITY_ORDER[b.priority] - PRIORITY_ORDER[a.priority])
+      todos.sort((a, b) => (b.priority ?? 5) - (a.priority ?? 5))
     }
 
     return todos
@@ -64,7 +66,7 @@ export class TodosService {
     const todo = this.todoRepository.create({ ...dto, userId })
     const saved = await this.todoRepository.save(todo)
     this.logger.log(`[create] Todo created — id=${saved.id} title="${saved.title}" userId=${userId}`)
-    return saved
+    return this.findOne(saved.id, userId)
   }
 
   async update(id: string, dto: UpdateTodoDto, userId: string): Promise<Todo> {
@@ -106,7 +108,7 @@ export class TodosService {
       `[update] DONE — id=${saved.id} title="${saved.title}" completed=${saved.completed} priority=${saved.priority}`
     )
 
-    return saved
+    return this.findOne(saved.id, userId)
   }
 
   async remove(id: string, userId: string): Promise<Todo> {
@@ -121,7 +123,7 @@ export class TodosService {
     todo.completed = !todo.completed
     const saved = await this.todoRepository.save(todo)
     this.logger.log(`[toggle] id=${id} completed=${saved.completed}`)
-    return saved
+    return this.findOne(saved.id, userId)
   }
 
   async addImages(id: string, userId: string, filenames: string[]): Promise<Todo> {
@@ -130,6 +132,6 @@ export class TodosService {
     todo.images = [...existing, ...filenames]
     const saved = await this.todoRepository.save(todo)
     this.logger.log(`[addImages] id=${id} totalImages=${saved.images?.length ?? 0}`)
-    return saved
+    return this.findOne(saved.id, userId)
   }
 }

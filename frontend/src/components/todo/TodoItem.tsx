@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { storageApi } from '@/apis/storageApi'
+import CategoryBadge from '@/components/category/CategoryBadge'
 import PhotoGallery from '@/components/common/PhotoGallery'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import { getPriorityColor } from '@/constants/todo.constants'
 import { getFileIcon, getFilename, isImageKey } from '@/lib/attachment.utils'
 import { formatDueDate, isOverdueDate } from '@/lib/date'
 import { getImageUrl, getThumbnailUrl } from '@/lib/storage'
@@ -64,15 +65,11 @@ export default function TodoItem({
     try {
       const blob = await storageApi.downloadFile(key)
       const blobUrl = window.URL.createObjectURL(blob)
-
-      // Create a temporary hidden anchor to trigger download
       const a = document.createElement('a')
       a.href = blobUrl
       a.download = filename
       document.body.appendChild(a)
       a.click()
-
-      // Cleanup
       document.body.removeChild(a)
       window.URL.revokeObjectURL(blobUrl)
     } catch (err) {
@@ -86,8 +83,17 @@ export default function TodoItem({
     setGalleryOpen(true)
   }
 
+  const priorityColor = todo.priority
+    ? getPriorityColor(todo.priority)
+    : '#6b7280'
+
   return (
-    <div className="bg-card hover:bg-accent/40 flex items-start gap-3 rounded-lg border p-4 shadow-sm transition-colors">
+    <div
+      className="bg-card hover:bg-accent/40 flex items-start gap-3 rounded-lg border border-l-4 p-4 shadow-sm transition-colors"
+      style={{
+        borderLeftColor: todo.completed ? `${priorityColor}55` : priorityColor
+      }}
+    >
       <Checkbox
         id={`todo-${todo.id}`}
         checked={todo.completed}
@@ -108,13 +114,16 @@ export default function TodoItem({
           {todo.title}
         </label>
 
+        {/* Category badge */}
+        {todo.category && <CategoryBadge category={todo.category} />}
+
         {todo.description && (
           <p className="text-muted-foreground line-clamp-3 text-sm break-all">
             {todo.description}
           </p>
         )}
 
-        {/* ── Image thumbnails (stacked) ────────────────────────────────── */}
+        {/* ── Image thumbnails ────────────────────────────────────────── */}
         {imageKeys.length > 0 && (
           <div className="flex -space-x-3">
             {imageKeys.slice(0, 3).map((img, i) => (
@@ -122,7 +131,7 @@ export default function TodoItem({
                 key={img}
                 src={getThumbnailUrl(img)}
                 alt={`Attachment ${i + 1}`}
-                className="border-border h-10 w-10 cursor-pointer rounded-lg border object-cover transition-transform hover:-translate-y-1 sm:h-12 sm:w-12"
+                className="border-border bg-muted h-10 w-10 cursor-pointer rounded-lg border object-cover transition-transform hover:-translate-y-1 sm:h-12 sm:w-12"
                 style={{ zIndex: 10 - i }}
                 onClick={() => openGallery(i)}
                 onError={e => {
@@ -136,7 +145,7 @@ export default function TodoItem({
             ))}
             {imageKeys.length > 3 && (
               <div
-                className="border-border bg-muted text-muted-foreground z-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-2 text-xs font-medium sm:h-12 sm:w-12 sm:text-sm"
+                className="border-border bg-muted text-muted-foreground z-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border text-xs font-medium sm:h-12 sm:w-12 sm:text-sm"
                 onClick={() => openGallery(3)}
               >
                 +{imageKeys.length - 3}
@@ -145,7 +154,7 @@ export default function TodoItem({
           </div>
         )}
 
-        {/* ── File chips (PDF, CSV, etc.) ───────────────────────────────── */}
+        {/* ── File chips ───────────────────────────────────────────── */}
         {fileKeys.length > 0 && (
           <TooltipProvider>
             <div className="flex flex-wrap gap-1.5">
@@ -184,31 +193,57 @@ export default function TodoItem({
             }`}
           >
             {overdue ? `⚠ ${t('overdue')}` : `📅 ${t('dueDate')}`}:{' '}
-            {formatDueDate(todo.dueDate, dateFnsLocale, 'PP')}
+            {formatDueDate(todo.dueDate, dateFnsLocale, 'PP h:mm a')}
           </p>
         )}
       </div>
 
       <div className="flex shrink-0 items-center gap-1">
+        {/* Priority flag */}
         {todo.priority && (
-          <Badge
-            variant="outline"
-            className={`hidden sm:inline-flex ${
-              todo.priority === 'high'
-                ? 'border-destructive text-destructive'
-                : todo.priority === 'medium'
-                  ? 'border-amber-500 text-amber-500'
-                  : 'border-emerald-500 text-emerald-500'
-            }`}
-          >
-            {t(`priority_${todo.priority}`, { defaultValue: todo.priority })}
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span
+                  className="hidden items-center gap-0.5 rounded-md border px-1.5 py-0.5 text-xs font-semibold sm:flex"
+                  style={{
+                    color: priorityColor,
+                    borderColor: `${priorityColor}55`,
+                    backgroundColor: `${priorityColor}11`
+                  }}
+                  aria-label={`${t('priority')} ${todo.priority}`}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-3.5 w-3.5"
+                    aria-hidden="true"
+                  >
+                    <rect
+                      x="5"
+                      y="2"
+                      width="2"
+                      height="20"
+                      rx="1"
+                      fill="currentColor"
+                    />
+                    <path d="M7 2.5L17.5 7L7 11.5Z" fill="currentColor" />
+                  </svg>
+                  {todo.priority}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {t('priority')} {todo.priority}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         {todo.completed && (
-          <Badge className="hidden bg-green-600 text-white hover:bg-green-700 sm:inline-flex">
+          <span className="hidden rounded-full bg-green-600 px-2 py-0.5 text-xs text-white sm:inline-flex">
             {t('completed')}
-          </Badge>
+          </span>
         )}
 
         <DropdownMenu>
@@ -243,7 +278,7 @@ export default function TodoItem({
         </DropdownMenu>
       </div>
 
-      {/* PhotoGallery — only for image attachments */}
+      {/* PhotoGallery */}
       <PhotoGallery
         images={imageKeys}
         open={galleryOpen}

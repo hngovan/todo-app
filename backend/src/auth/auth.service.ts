@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
+import * as bcrypt from 'bcryptjs'
 import { UsersService } from '@/users/users.service'
 import { User } from '@/users/entities/user.entity'
 import { RegisterDto } from './dto/register.dto'
@@ -25,7 +26,7 @@ export class AuthService {
     return this.buildPayload(user)
   }
 
-  login(user: User): AuthPayload {
+  async login(user: User): Promise<AuthPayload> {
     return this.buildPayload(user)
   }
 
@@ -41,14 +42,28 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET')
       })
       const user = await this.usersService.findById(payload.sub)
-      if (!user) throw new UnauthorizedException('messages.error.user_not_found')
+
+      if (!user || !user.currentRefreshToken) {
+        throw new UnauthorizedException('messages.error.invalid_token')
+      }
+
+      const isTokenMatching = await bcrypt.compare(refreshToken, user.currentRefreshToken)
+      if (!isTokenMatching) {
+        throw new UnauthorizedException('messages.error.invalid_token')
+      }
+
       return this.buildPayload(user)
     } catch {
       throw new UnauthorizedException('messages.error.invalid_token')
     }
   }
 
-  private buildPayload(user: User): AuthPayload {
+  async logout(userId: string) {
+    await this.usersService.setCurrentRefreshToken(userId, null)
+    return { success: true, message: 'Logged out successfully' }
+  }
+
+  private async buildPayload(user: User): Promise<AuthPayload> {
     const { password, todos, ...profile } = user
     void password
     void todos
@@ -63,6 +78,9 @@ export class AuthService {
         expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') ?? '7d') as unknown as number
       }
     )
+
+    await this.usersService.setCurrentRefreshToken(user.id, refresh_token)
+
     return { user: profile, access_token, refresh_token }
   }
 }
